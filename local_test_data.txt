@@ -1,1 +1,0 @@
-curl --header "Content-Type: application/json"   --request POST   --data '{"reviewname":"test","id":"123"}'   http://localhost:8080/review
