@@ -16,7 +16,7 @@ var jsonParser = bodyParser.json();
 //var urlencodedParser = bodyParser.urlencoded({ extended: false })    //not sure about the use of the URL encoding, including for now
 
 //
-// ## SimpleServer `SimpleServer(obj)`
+// 
 //
 // Creates a new instance of SimpleServer with the following options:
 //  * `port` - The HTTP port to listen on. If `process.env.PORT` is set, _it overrides this value_.
@@ -89,27 +89,26 @@ router.get('/review/:reviewid', function (req, res) {
 
 // get random review by stars
 router.get('/review/:n/:stars', function (req, res) {           
-        res.json(get_test);
+        res.json('You sent a GET request with the following URL params: n: ' + req.params.n + 'stars: ' + req.params.stars );     //just testing that we can parse URL params.
     });
     
 // get random review by date
-router.get('/review/:n/:from_date/:to_date', function (req, res) {   //how to format/parse date?       
+router.get('/review/:n/:from_date/:to_date', function (req, res) {   //how to format/parse date? .. here we are just sending a test json doc back to ensure we can parse a json object through the HTTP reponse.    
         res.json(get_test);
     });
     
-router.post('/review', jsonParser, function (req, res) {
+router.post('/review', jsonParser, function (req, res) {      //ensure we can receive and parse a POST raw JSON request and deserialize a JSON object from a file var or const and send as a string to the client.
         if (!req.body) return res.sendStatus(400);
-          
           res.send('for POST: you sent the review id, ' + req.body.id + '\nHere is some test data: \n' + JSON.stringify(post_test));      
         
     });    
     
-router.put('/review', function (req, res) {
-        res.send("for PUT: reviewid is set to " + req.body.reviewid);     //add review body to response
+router.put('/review', jsonParser, function (req, res) {
+        res.send("for PUT: reviewid is set to " + req.body.reviewid + '\n'+ 'review body: ' + req.body.reviewbody);     //ensure we can receive a PUT request review body and parse
     });
 
-router.delete('/review', function (req, res) {
-        res.send("reviewid is set to " + req.params.reviewid);
+router.delete('/review', jsonParser, function (req, res) {
+        res.send("for DELETE: reviewid is set to " + req.body.reviewid +'\n');
     });    
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
