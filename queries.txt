@@ -1,0 +1,52 @@
+db.students.insert({
+  name: "Jonny Boy",
+  dorm: {
+      name: "Rivers",
+      number: 302,
+  },
+  classes: [{name: "Math"}, {days: ["M","W","F"]}, {credits: 3},
+  {name: "Science"}, {days: ["T","TH"]}, {credits: 4}]  
+});
+
+db.students.insert({
+  name: "Scrambey Matthews",
+  dorm: {
+      name: "Rice",
+      number: 551,
+  },
+  classes: [{name: "Science"}, {days: ["M","W","F"]}, {credits: 3},
+  {name: "History"}, {days: ["T","TH"]}, {credits: 3}]  
+});
+
+db.students.insert({
+  name: "Slaw Tubb",
+  dorm: {
+      name: "Olive",
+      number: 101,
+  },
+  classes: [{name: "Computer Science"}, {days: ["M","W","F"]}, {credits: 4},
+  {name: "History"}, {days: ["T","TH"]}, {credits: 3}]  
+});
+
+db.students.find({
+  
+  "classes.credits": {$gte : 2}
+  
+});
+
+/increment all student years by one
+
+db.students.update (
+  {},
+  {$inc: {age: 1} }
+  );
+  
+  //decrememnt all student ages by one
+  
+  db.students.update(
+  {$eq : {age:1]}}
+  {$unset: age}
+  {multi:true}        //multi is on exam
+  
+  
+  );
