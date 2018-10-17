@@ -9,7 +9,7 @@ db.students.insert({
 });
 
 db.students.insert({
-  name: "Scrambey Matthews",
+  name: "Scrambey Matt hews",
   dorm: {
       name: "Rice",
       number: 551,
@@ -50,3 +50,10 @@ db.students.update (
   
   
   );
+  
+ db.product.find({
+  name: {},
+  category: {}
+});
+
+db.product.find({}, {name:1, category:1, _id:0})
