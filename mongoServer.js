@@ -237,7 +237,7 @@ router.get('/review/info/:custid', jsonParser, function (req, res) {
         { 
             $group: 
             { 
-                _id: "$product.id", 
+                _id: "$product.category", 
                 avgStars: { $avg : "$review.star_rating" }, 
                 avgHelpfulVotes: { $avg : "$votes.helpful_votes" },
                 avgTotalVotes: { $avg : "$votes.total_votes" }
