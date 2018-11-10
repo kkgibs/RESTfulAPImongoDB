@@ -22,7 +22,7 @@ var url = "mongodb://omega.unasec.info/amazon";
 
 router.use(express.static(path.resolve(__dirname, 'client')));
 
-
+//get a review
 router.get('/review/:reviewid', jsonParser, function (req, res) {           
     mongoClient.connect(url,  { useNewUrlParser: true }, function(err, db) { 
     if (err) throw err;
@@ -90,7 +90,8 @@ router.get('/review/:n/:from_date/:to_date', function (req, res) {
          });
     });
 });
-    
+
+//add a review    
 router.post('/review', jsonParser, function (req, res) {
         if (!req.body) return res.sendStatus(400);
         mongoClient.connect(url,  { useNewUrlParser: true }, function(err, db) { 
@@ -104,7 +105,8 @@ router.post('/review', jsonParser, function (req, res) {
         });
     });
 });    
-    
+
+//update a review    
 router.put('/review/:reviewid', jsonParser, function (req, res) {
         //res.send("for PUT: reviewid is set to " + req.params.reviewid + '\n'+ 'review body: ' + req.body);
         mongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
@@ -121,14 +123,11 @@ router.put('/review/:reviewid', jsonParser, function (req, res) {
             if (err) throw err;
             res.send(results);
             db.close();
-  });
-});
+        });
     });
+});
 
-router.delete('/review', jsonParser, function (req, res) {
-        res.send("for DELETE: reviewid is set to " + req.body.reviewid +'\n');
-    });    
-    
+
 // Delete a review
 router.delete('/review/:reviewid', jsonParser, function (req, res) {
   mongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
@@ -145,16 +144,7 @@ router.delete('/review/:reviewid', jsonParser, function (req, res) {
   });
 });
 
-// Get random reviews by stars
-router.get('/review/:n/:stars', function(req, res) {
-  res.send("These are reviews with " + req.params.stars + " stars.");
-});
-
-// Get random reviews by date
-router.get('/review/:n/:from_date/:to_date', function(req, res) {
-  res.send("These are reviews from " + req.params.from_date + " to " + req.params.to_date);
-});
-
+//helpful votes by product
 router.get('/review/helpful/:prodid', jsonParser, function (req, res) {          
     mongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
       if (err) throw err;
@@ -188,6 +178,7 @@ router.get('/review/helpful/:prodid', jsonParser, function (req, res) {
   });
 });
 
+//avg review stars over time
 router.get('/review/:from/:to', jsonParser, function (req, res) {          
     mongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
       if (err) throw err;
@@ -231,6 +222,7 @@ router.get('/review/:from/:to', jsonParser, function (req, res) {
   });
 });
 
+//avg review info for a customer by category
 router.get('/review/info/:custid', jsonParser, function (req, res) {          
 
     mongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
@@ -245,7 +237,7 @@ router.get('/review/info/:custid', jsonParser, function (req, res) {
         { 
             $group: 
             { 
-                _id: null, 
+                _id: "$product.id", 
                 avgStars: { $avg : "$review.star_rating" }, 
                 avgHelpfulVotes: { $avg : "$votes.helpful_votes" },
                 avgTotalVotes: { $avg : "$votes.total_votes" }
@@ -272,4 +264,3 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   var addr = server.address();
   console.log("CIS 445 server listening at", addr.address + ":" + addr.port);
 });
-
