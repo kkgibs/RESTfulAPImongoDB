@@ -128,6 +128,145 @@ router.put('/review/:reviewid', jsonParser, function (req, res) {
 router.delete('/review', jsonParser, function (req, res) {
         res.send("for DELETE: reviewid is set to " + req.body.reviewid +'\n');
     });    
+    
+// Delete a review
+router.delete('/review/:reviewid', jsonParser, function (req, res) {
+  mongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("amazon");  
+      var collection = dbo.collection('reviews');
+      var myquery = { "review.id" : `${req.params.reviewid}` };
+      
+      collection.deleteMany(myquery, function(err, obj) {
+        if (err) throw err;
+        console.log("1 document deleted");
+        db.close();
+      });
+  });
+});
+
+// Get random reviews by stars
+router.get('/review/:n/:stars', function(req, res) {
+  res.send("These are reviews with " + req.params.stars + " stars.");
+});
+
+// Get random reviews by date
+router.get('/review/:n/:from_date/:to_date', function(req, res) {
+  res.send("These are reviews from " + req.params.from_date + " to " + req.params.to_date);
+});
+
+router.get('/review/helpful/:prodid', jsonParser, function (req, res) {          
+    mongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("amazon");  
+      var collection = dbo.collection('reviews');
+  
+      collection.aggregate([ 
+        { $limit : 1000000 }, 
+        { $match : { "product.id" : `${req.params.prodid}` }}, 
+        { 
+          $group: 
+            { 
+              _id: null, 
+              avgHelpfulVotes: { $avg : "$votes.helpful_votes" } 
+              
+            }
+        }
+        ]).toArray(function(err, results) { 
+      if(!err) {
+          /*console.log(results.length);
+          for(var i = 0; i < results.length; i++) {
+            console.log(results[i]);
+          }*/
+          res.json(results);
+      }
+      else {
+          res.send(err);
+          db.close();
+      }
+    });
+  });
+});
+
+router.get('/review/:from/:to', jsonParser, function (req, res) {          
+    mongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("amazon");  
+      var collection = dbo.collection('reviews');
+      var from = new Date(`${req.params.from}`);
+      var to = new Date(`${req.params.to}`);
+  
+      collection.aggregate([
+        { $limit : 1000000 },
+        {
+            $match:
+                { "review.date" : { $gte : from, $lte : to } } 
+        }, 
+        { 
+            $group: 
+            { 
+                _id: null, 
+                avgStars: { $avg : "$review.star_rating" } 
+            } 
+        } 
+]).toArray(function(err, results) { 
+        // callback arguments are err or an array of results
+      if(!err) {
+  
+          console.log(results.length);
+  
+          for(var i = 0; i < results.length; i++) {
+  
+            console.log(results[i]);
+          }
+  
+          res.json(results);
+      }
+  
+      else {
+          res.send(err);
+          db.close();
+      }
+    });
+  });
+});
+
+router.get('/review/info/:custid', jsonParser, function (req, res) {          
+
+    mongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("amazon");  
+      var collection = dbo.collection('reviews');
+      collection.aggregate([
+        /*{ $limit : 1000000 }, */
+        {
+            $match: { customer_id : `${req.params.custid}` } 
+        }, 
+        { 
+            $group: 
+            { 
+                _id: null, 
+                avgStars: { $avg : "$review.star_rating" }, 
+                avgHelpfulVotes: { $avg : "$votes.helpful_votes" },
+                avgTotalVotes: { $avg : "$votes.total_votes" }
+            } 
+        } 
+]).toArray(function(err, results) { 
+      if(!err) {
+          /*console.log("YEP");
+          for(var i = 0; i < results.length; i++) {
+            console.log(results[i]);
+          }*/
+          res.json(results);
+      }
+  
+      else {
+        res.send(err);
+        db.close();
+      }
+    });
+  });
+});
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   var addr = server.address();
