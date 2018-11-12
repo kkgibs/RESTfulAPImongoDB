@@ -19,7 +19,6 @@ var io = socketio.listen(server);
 var mongoClient = require('mongodb').MongoClient; // initializes the mongodb library and gets a client object
 var url = "mongodb://omega.unasec.info/amazon";
 
-
 router.use(express.static(path.resolve(__dirname, 'client')));
 
 //get a review
@@ -45,7 +44,7 @@ router.get('/review/:reviewid', jsonParser, function (req, res) {
 });
 
 // get random review by stars
-router.get('/review/:n/:stars', function (req, res) {      
+router.get('/review/random/:n/:stars', function (req, res) {      
  mongoClient.connect(url,  { useNewUrlParser: true }, function(err, db) { 
     if (err) throw err;
     var stars = parseInt(req.params.stars);
